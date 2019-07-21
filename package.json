@@ -1,7 +1,7 @@
 {
-  "name": "rekordcloud-itunes-processor",
+  "name": "itunes-epf-processor",
   "version": "1.0.0",
-  "description": "Nodejs project that downloads iTunes EPF feed and processes certain data into a Mongodb server",
+  "description": "Nodejs TypeScript project that downloads iTunes EPF feed and processes certain data into a Mongodb server",
   "author": "Christiaan Maks <christilut@gmail.com>",
   "main": "index.ts",
   "private": false,
