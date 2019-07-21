@@ -20,34 +20,34 @@ export class Song extends Typegoose {
     index: true,
     required: true
   })
-  songId: Number
+  songId: number
 
   @prop({
     required: true
   })
-  title: String
+  title: string
 
   @prop({
     required: true
   })
-  artistName: String
+  artistName: string
 
   @prop()
-  collectionName: String
+  collectionName: string
 
   @prop({
     required: true
   })
-  viewUrl: String
+  viewUrl: string
 
   @prop()
-  durationMs: Number
+  durationMs: number
 
   @prop()
-  previewUrl: String
+  previewUrl: string
 
   @prop()
-  previewDurationMs: Number
+  previewDurationMs: number
 }
 
 export const SongModel = new Song().getModelForClass(Song, {

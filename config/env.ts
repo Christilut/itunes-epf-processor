@@ -19,6 +19,9 @@ export interface IEnvironmentVariables {
   AWS_LOG_GROUP?: string
   SENTRY_URL?: string
 
+  EPF_USERNAME?: string
+  EPF_PASSWORD?: string
+
   Environments: typeof Environments
 }
 
@@ -39,7 +42,9 @@ const allowedEnvKeys: Joi.SchemaMap = {
   EMAIL_FROM_ADDRESS: Joi.string().email().allow('').optional(),
   EMAIL_DEV_ADDRESS: Joi.string().email().allow('').optional(),
   SENTRY_URL: Joi.string().uri().allow('').optional(),
-  AWS_LOG_GROUP: Joi.string().allow('').optional()
+  AWS_LOG_GROUP: Joi.string().allow('').optional(),
+  EPF_USERNAME: Joi.string().required(),
+  EPF_PASSWORD: Joi.string().required()
 }
 
 let envVarsSchema = Joi.object(allowedEnvKeys).unknown().required()

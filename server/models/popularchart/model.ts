@@ -22,29 +22,29 @@ export class PopularChart extends Typegoose {
     minlength: 2,
     required: true
   })
-  countryCode: String
+  countryCode: string
 
   @prop({
     index: true,
     required: true
   })
-  storefrontId: Number
+  storefrontId: number
 
   @prop({
     required: true
   })
-  genreName: String
+  genreName: string
 
   @prop({
     index: true,
     required: true
   })
-  genreId: Number
+  genreId: number
 
   @prop({
     default: []
   })
-  topSongIds: [Number]
+  topSongIds: number[]
 }
 
 export const PopularChartModel = new PopularChart().getModelForClass(PopularChart, {
