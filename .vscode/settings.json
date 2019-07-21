@@ -1,0 +1,11 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+  "files.exclude": {
+    "dist/": true,
+    "node_modules/": true,
+    ".nyc_output/": true,
+    "coverage/": true
+  },
+  "git.ignoreLimitWarning": true,
+  "eslint.enable": false
+}

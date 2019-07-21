@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  start:
+    image: 'node:8-slim'
+    working_dir: /src
+    volumes:
+      - ./:/src
+    ports:
+      - '5000'
+    network_mode: host

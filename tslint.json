@@ -1,0 +1,21 @@
+{
+  "extends": "tslint-config-standard",
+  "rules": {
+    "space-before-function-paren": false,
+    "interface-name": [
+      true,
+      "always-prefix"
+    ],
+    "array-type": [
+      true,
+      "array"
+    ],
+    "no-angle-bracket-type-assertion": true,
+    "no-floating-promises": true,
+    "promise-function-async": true,
+    "no-unused-variable": false,
+    "await-promise": false,
+    "strict-boolean-expressions": false,
+    "no-unnecessary-type-assertion": false
+  }
+}
