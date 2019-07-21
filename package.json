@@ -39,7 +39,6 @@
   "dependencies": {
     "@types/cheerio": "^0.22.12",
     "@types/fs-extra": "5.0.5",
-    "@types/http-status": "^0.2.30",
     "@types/joi": "14.3.3",
     "@types/mongoose": "5.5.9",
     "@types/node": "^8.10.10",

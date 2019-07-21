@@ -1,7 +1,7 @@
-import gunzip from 'bzip2-maybe'
+import * as gunzip from 'bzip2-maybe'
 import { createWriteStream, createReadStream, WriteStream, ReadStream } from 'fs'
 import { get } from 'https'
-import tar from 'tar-stream'
+import * as tar from 'tar-stream'
 import { IncomingMessage } from 'http'
 
 async function downloadFile(url: string, filePath: string): Promise<void> {

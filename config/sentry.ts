@@ -1,19 +1,6 @@
 import env from 'config/env'
 import * as Raven from 'raven'
-import * as httpStatus from 'http-status'
 import logger from 'config/logger'
-
-function sentryFilter(data) {
-  const statusCode = data.res.statusCode
-
-  // Filter auth errors
-  if (statusCode === httpStatus.UNAUTHORIZED) return false
-
-  // Filter users trying things they shouldnt
-  if (statusCode === httpStatus.FORBIDDEN) return false
-
-  return true
-}
 
 function dataCallback(data) {
   logger.error('Sentry error: ' + data.message, {
@@ -28,7 +15,6 @@ function dataCallback(data) {
 
 Raven.config(env.SENTRY_URL, {
   environment: env.NODE_ENV,
-  shouldSendCallback: sentryFilter,
   dataCallback
 }).install()
 
