@@ -2,13 +2,14 @@ require('app-module-path').addPath(__dirname + '/..')
 
 import logger from 'config/logger'
 import * as mongoose from 'config/mongoose'
-import { COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD, COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_SONGS, COLLECTION_SONGS_OLD, COLLECTION_SONGS_PROCESSING, PopularChartModel, PopularChartProcessingModel, SongModel, SongProcessingModel } from 'server/models'
 import { INumberStringSignature } from './interfaces/generic'
 import { processCombinedPopularityMatrix } from './processing/process'
 import { getUrlZipStream } from './processing/downloader'
 import { getLatestFeedInfo, IFeedInfoObject } from './processing/feedcheck'
 import { readEpfGenreByLine, readEpfSongPopularityByLine, readEpfStorefrontByLine, upsertSongs } from './processing/reader'
 import { getStats, IFeedStats, writeStats } from './processing/stats'
+import { COLLECTION_SONGS_PROCESSING, COLLECTION_SONGS_OLD, SongModel, COLLECTION_SONGS } from './models/song'
+import { COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS_OLD, PopularChartModel, COLLECTION_POPULARCHARTS } from './models/popularchart'
 
 mongoose.default.connection.once('open', async function () {
   logger.info('starting EPF update process')

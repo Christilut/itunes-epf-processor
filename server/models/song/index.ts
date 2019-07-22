@@ -1,6 +1,5 @@
-import env from 'config/env'
-import * as mongoose from 'mongoose'
-import { prop, arrayProp, Typegoose, InstanceType, staticMethod, instanceMethod, pre } from 'typegoose'
+import { prop, Typegoose } from 'typegoose'
+import { generateModel } from '../../helpers/typegoose'
 
 export const COLLECTION_SONGS = 'songs'
 export const COLLECTION_SONGS_OLD = 'songs_old'
@@ -50,16 +49,11 @@ export class Song extends Typegoose {
   previewDurationMs: number
 }
 
-export const SongModel = new Song().getModelForClass(Song, {
+const model = new Song().getModelForClass(Song, {
   schemaOptions: {
-    timestamps: true,
-    collection: COLLECTION_SONGS
+    timestamps: true
   }
 })
 
-export const SongProcessingModel = new Song().getModelForClass(COLLECTION_SONGS_PROCESSING, {
-  schemaOptions: {
-    timestamps: true,
-    collection: COLLECTION_SONGS_PROCESSING
-  }
-})
+export const SongModel = generateModel<Song>(model, COLLECTION_SONGS)
+export const SongProcessingModel = generateModel<Song>(model, COLLECTION_SONGS_PROCESSING)

@@ -1,4 +1,4 @@
-import { SongProcessingModel, Song } from '../models'
+import { SongProcessingModel, Song } from '../models/song'
 import * as lineReader from 'line-reader'
 import { promisify } from 'util'
 import { ReadStream } from 'fs'

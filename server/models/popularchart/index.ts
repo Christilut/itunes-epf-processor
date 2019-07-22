@@ -1,6 +1,5 @@
-import env from 'config/env'
-import * as mongoose from 'mongoose'
-import { prop, arrayProp, Typegoose, InstanceType, staticMethod, instanceMethod, pre, index } from 'typegoose'
+import { index, prop, Typegoose } from 'typegoose'
+import { generateModel } from '../../helpers/typegoose'
 
 export const COLLECTION_POPULARCHARTS = 'popularcharts'
 export const COLLECTION_POPULARCHARTS_OLD = 'popularcharts_old'
@@ -47,16 +46,11 @@ export class PopularChart extends Typegoose {
   topSongIds: number[]
 }
 
-export const PopularChartModel = new PopularChart().getModelForClass(PopularChart, {
+const model = new PopularChart().getModelForClass(PopularChart, {
   schemaOptions: {
-    timestamps: true,
-    collection: COLLECTION_POPULARCHARTS
+    timestamps: true
   }
 })
 
-export const PopularChartProcessingModel = new PopularChart().getModelForClass(PopularChart, {
-  schemaOptions: {
-    timestamps: true,
-    collection: COLLECTION_POPULARCHARTS_PROCESSING
-  }
-})
+export const PopularChartModel = generateModel<PopularChart>(model, COLLECTION_POPULARCHARTS)
+export const PopularChartProcessingModel = generateModel<PopularChart>(model, COLLECTION_POPULARCHARTS_PROCESSING)

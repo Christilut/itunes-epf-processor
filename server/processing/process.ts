@@ -1,4 +1,4 @@
-import { PopularChartProcessingModel } from '../models'
+import { PopularChartProcessingModel } from '../models/popularchart'
 import { INumberStringSignature } from '../interfaces/generic'
 import { IPopularityMatrixSignature } from '../interfaces/epf'
 import logger from 'config/logger'
