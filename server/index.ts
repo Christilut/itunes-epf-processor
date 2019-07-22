@@ -52,8 +52,8 @@ mongoose.default.connection.once('open', async function () {
     await SongModel.aggregate([{ $match: {} }, { $out: COLLECTION_SONGS_PROCESSING }])
     await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
 
-    await SongProcessingModel.collection.createIndex({ songId: 1 }, { unique: true })
-    await PopularChartProcessingModel.collection.createIndex({ storefrontId: 1, genreId: 1 }, { unique: true })
+    await mongoose.default.connection.db.createIndex(COLLECTION_SONGS_PROCESSING, { songId: 1 }, { unique: true })
+    await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
 
     logger.info('done copying collections to temporary collections')
   } else {
