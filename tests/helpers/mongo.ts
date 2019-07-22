@@ -15,7 +15,7 @@ if (env.NODE_ENV === env.Environments.Test) { // Prevents deprecation warnings
 // const uri = await mongod.getConnectionString()
 
 // All test files run in their own worker but they should share the same database
-const databaseName = 'boilerplate-test-' + randomatic('Aa0', 20)
+const databaseName = 'itunes-epf-test-' + randomatic('Aa0', 20)
 
 export function generateRandomDatabaseName() {
   return databaseName

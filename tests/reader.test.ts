@@ -5,9 +5,7 @@ require('app-module-path').addPath(__dirname + '/..')
 import test from 'ava'
 import env from 'config/env'
 import * as mongoose from 'mongoose'
-import { UserModel } from 'server/models'
 import { generateRandomDatabaseName } from './helpers/mongo'
-import { TestUser } from './helpers/user'
 
 test.before(async t => {
   const uri = 'mongodb://localhost/' + generateRandomDatabaseName()
@@ -22,17 +20,7 @@ test.after.always(async t => {
 })
 
 test('user - throw error when using comparePassword and user does not have a password', async (t) => {
-  const user = new UserModel()
 
-  user.password = ''
-
-  try {
-    await user.comparePassword('test')
-
-    t.fail()
-  } catch (error) {
-    t.pass()
-  }
 })
 
 // test('user - expect error when trying to update user that does not exist', async (t) => {
