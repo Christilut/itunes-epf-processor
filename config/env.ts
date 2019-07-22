@@ -16,6 +16,10 @@ export interface IEnvironmentVariables {
   EMAIL_FROM_ADDRESS?: string
   EMAIL_DEV_ADDRESS?: string
 
+  AWS_ACCESS_KEY_ID?: string
+  AWS_SECRET_ACCESS_KEY?: string
+  AWS_REGION?: string
+
   AWS_LOG_GROUP?: string
   SENTRY_URL?: string
 
