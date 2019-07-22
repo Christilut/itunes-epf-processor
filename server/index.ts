@@ -4,7 +4,7 @@ import logger from 'config/logger'
 import * as mongoose from 'config/mongoose'
 import { COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD, COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_SONGS, COLLECTION_SONGS_OLD, COLLECTION_SONGS_PROCESSING, PopularChartModel, PopularChartProcessingModel, SongModel, SongProcessingModel } from 'server/models'
 import { INumberStringSignature } from './interfaces/generic'
-import { processCombinedPopularityMatrix } from './processing/database'
+import { processCombinedPopularityMatrix } from './processing/process'
 import { getUrlZipStream } from './processing/downloader'
 import { getLatestFeedInfo, IFeedInfoObject } from './processing/feedcheck'
 import { readEpfGenreByLine, readEpfSongPopularityByLine, readEpfStorefrontByLine, upsertSongs } from './processing/reader'
@@ -30,8 +30,8 @@ mongoose.default.connection.once('open', async function () {
     if (epfInfo.incremental && epfInfo.incremental.date > lastStats.lastImported) retrieveIncrementalFeed = true // Incremental available and its newer than last time we processed
   }
 
-  logger.info('going to retrieve full feed:', retrieveFullFeed)
-  logger.info('going to retrieve incremental feed:', retrieveIncrementalFeed)
+  logger.info('going to retrieve full feed:' + retrieveFullFeed)
+  logger.info('going to retrieve incremental feed:' + retrieveIncrementalFeed)
 
   let countryCodeByStorefrontIdMap: INumberStringSignature
   let genreIdMap: INumberStringSignature
