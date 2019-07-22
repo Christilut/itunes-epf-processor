@@ -71,8 +71,6 @@ mongoose.default.connection.once('open', async function () {
 
     await upsertSongs(savedSongIds, await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}song.tbz`), true)
 
-    writeStats()
-
     logger.profile('done retrieving full feed')
   }
 
@@ -86,12 +84,12 @@ mongoose.default.connection.once('open', async function () {
 
     await upsertSongs(savedSongIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
 
-    writeStats()
-
     logger.profile('done processing incremental feed')
   }
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
+    writeStats()
+
     // Swap collection names and delete old collection
     await mongoose.default.connection.db.renameCollection(COLLECTION_SONGS, COLLECTION_SONGS_OLD)
     await mongoose.default.connection.db.renameCollection(COLLECTION_SONGS_PROCESSING, COLLECTION_SONGS)
