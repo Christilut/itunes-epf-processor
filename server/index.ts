@@ -31,8 +31,8 @@ mongoose.default.connection.once('open', async function () {
     if (epfInfo.incremental && epfInfo.incremental.date > lastStats.lastImported) retrieveIncrementalFeed = true // Incremental available and its newer than last time we processed
   }
 
-  logger.info('going to retrieve full feed:' + retrieveFullFeed)
-  logger.info('going to retrieve incremental feed:' + retrieveIncrementalFeed)
+  logger.info('going to retrieve full feed: ' + retrieveFullFeed)
+  logger.info('going to retrieve incremental feed: ' + retrieveIncrementalFeed)
 
   let countryCodeByStorefrontIdMap: INumberStringSignature
   let genreIdMap: INumberStringSignature

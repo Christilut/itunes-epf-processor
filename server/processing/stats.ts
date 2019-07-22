@@ -1,7 +1,7 @@
 import { writeJsonSync, existsSync, readFileSync } from 'fs-extra'
 import { join } from 'path'
 
-const STATS_PATH: string = join(__dirname, 'stats.json')
+const STATS_PATH: string = join(__dirname, '..', '..', 'stats.json')
 
 export interface IFeedStats {
   lastImported: Date
