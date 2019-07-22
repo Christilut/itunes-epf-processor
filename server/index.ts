@@ -2,14 +2,13 @@ require('app-module-path').addPath(__dirname + '/..')
 
 import logger from 'config/logger'
 import * as mongoose from 'config/mongoose'
-import 'config/sentry'
 import { COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD, COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_SONGS, COLLECTION_SONGS_OLD, COLLECTION_SONGS_PROCESSING, PopularChartModel, PopularChartProcessingModel, SongModel, SongProcessingModel } from 'server/models'
+import { INumberStringSignature } from './interfaces/generic'
+import { processCombinedPopularityMatrix } from './processing/database'
 import { getUrlZipStream } from './processing/downloader'
 import { getLatestFeedInfo, IFeedInfoObject } from './processing/feedcheck'
 import { readEpfGenreByLine, readEpfSongPopularityByLine, readEpfStorefrontByLine, upsertSongs } from './processing/reader'
 import { getStats, IFeedStats, writeStats } from './processing/stats'
-import { processCombinedPopularityMatrix } from './processing/database'
-import { INumberStringSignature } from './interfaces/generic'
 
 mongoose.default.connection.once('open', async function () {
   logger.info('starting EPF update process')
@@ -21,7 +20,7 @@ mongoose.default.connection.once('open', async function () {
 
   const epfInfo: IFeedInfoObject = await getLatestFeedInfo()
 
-  logger.info(epfInfo)
+  logger.info('epf info', epfInfo)
 
   if (!lastStats) retrieveFullFeed = true // Server never ran yet, get full feed
   if (!lastStats && epfInfo.incremental) retrieveIncrementalFeed = true // Server never ran & incremental available, get incremental too

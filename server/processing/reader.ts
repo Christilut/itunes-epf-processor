@@ -5,6 +5,7 @@ import { ReadStream } from 'fs'
 import { InstanceType } from 'typegoose'
 import { INumberStringSignature, IStringStringSignature } from '../interfaces/generic'
 import { IPopularityMatrixSignature } from '../interfaces/epf'
+import logger from 'config/logger'
 const countryCodesByIso2 = require('../../countryCodes.json')
 
 const eachLine = promisify(lineReader.eachLine)
@@ -36,8 +37,8 @@ const ALLOWED_GENRE_MAP: { [key: number]: number } = { // The left side will be 
 }
 
 export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream, insertOnly: boolean): Promise<void> {
-  console.time('done adding songs to db')
-  console.log('started adding songs to db')
+  logger.profile('done adding songs to db')
+  logger.info('started adding songs to db')
 
   let scannedAmount: number = 0
 
@@ -84,19 +85,19 @@ export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream,
 
     scannedAmount++
 
-    if (scannedAmount % 10000 === 0) {
-      console.log(`scanned ${scannedAmount} tracks so far`)
+    if (scannedAmount % 1000000 === 0) {
+      logger.info(`scanned ${scannedAmount} tracks so far`)
     }
 
     callback(!last) // End if last or next line
   })
 
-  console.timeEnd('done adding songs to db')
+  logger.profile('done adding songs to db')
 }
 
 export async function readEpfGenreByLine(stream: ReadStream): Promise<INumberStringSignature> {
-  console.time('done saving genres to memory')
-  console.log('started saving genres to memory')
+  logger.profile('done saving genres to memory')
+  logger.info('started saving genres to memory')
 
   const genreIdMap: INumberStringSignature = {}
 
@@ -115,14 +116,14 @@ export async function readEpfGenreByLine(stream: ReadStream): Promise<INumberStr
     callback(!last) // Go to next line
   })
 
-  console.timeEnd('done saving genres to memory')
+  logger.profile('done saving genres to memory')
 
   return genreIdMap
 }
 
 export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{ combinedPopularityMatrix: IPopularityMatrixSignature, savedSongIds: Set<number> }> {
-  console.time('done processing popularity')
-  console.log('started processing popularity')
+  logger.profile('done processing popularity')
+  logger.info('started processing popularity')
 
   const combinedPopularityMatrix: IPopularityMatrixSignature = {}
   const savedSongIds: Set<number> = new Set([])
@@ -157,7 +158,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
     callback(!last)
   })
 
-  console.timeEnd('done processing popularity')
+  logger.profile('done processing popularity')
 
   return {
     combinedPopularityMatrix,
@@ -166,8 +167,8 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
 }
 
 export async function readEpfStorefrontByLine(stream: ReadStream): Promise<INumberStringSignature> {
-  console.time('done reading storefronts into memory')
-  console.log('started reading storefronts into memory')
+  logger.profile('done reading storefronts into memory')
+  logger.info('started reading storefronts into memory')
 
   const countryCodeByStorefrontIdMap: INumberStringSignature = {}
   const countryCodesByIso3Map: IStringStringSignature = {}
@@ -188,7 +189,7 @@ export async function readEpfStorefrontByLine(stream: ReadStream): Promise<INumb
     const countryCodeIso2: string = countryCodesByIso3Map[countryCodeIso3]
 
     if (!countryCodeIso2) {
-      console.log(`Country code ISO3 value "${countryCodeIso3}" had no ISO2 match`)
+      logger.info(`Country code ISO3 value "${countryCodeIso3}" had no ISO2 match`)
     }
 
     countryCodeByStorefrontIdMap[storefrontId] = countryCodeIso2
@@ -196,7 +197,7 @@ export async function readEpfStorefrontByLine(stream: ReadStream): Promise<INumb
     callback(!last)
   })
 
-  console.timeEnd('done reading storefronts into memory')
+  logger.profile('done reading storefronts into memory')
 
   return countryCodeByStorefrontIdMap
 }
