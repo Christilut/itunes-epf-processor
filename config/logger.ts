@@ -2,12 +2,14 @@ import env from 'config/env'
 const winston = require('winston')
 const { format } = require('winston')
 const WinstonCloudwatch = require('winston-cloudwatch')
-// import { stringify } from 'flatted/esm'
 
 const transports = []
 
 function consoleFormatter(msg) {
   let output = `${msg.level}: ${msg.message}`
+
+  if (msg.hasOwnProperty('durationMs')) output = `${output} (duration: ${msg.durationMs}ms)`
+
   if (msg.meta) {
     if (msg.meta.err) {
       delete msg.meta.err.config // Delete circular objects from the request that arent interesting anyway

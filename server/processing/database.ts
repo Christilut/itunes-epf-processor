@@ -1,10 +1,11 @@
 import { PopularChartProcessingModel } from '../models'
 import { INumberStringSignature } from '../interfaces/generic'
 import { IPopularityMatrixSignature } from '../interfaces/epf'
+import logger from 'config/logger'
 
 export async function processCombinedPopularityMatrix(combinedPopularityMatrix: IPopularityMatrixSignature, genreIdMap: INumberStringSignature, countryCodeByStorefrontIdMap: INumberStringSignature) {
-  console.time('done saving popularcharts to db')
-  console.log('started saving popularcharts to db')
+  logger.profile('done saving popularcharts to db')
+  logger.info('started saving popularcharts to db')
 
   for (const pair of Object.keys(combinedPopularityMatrix)) {
     const split: string[] = pair.split('.')
@@ -35,5 +36,5 @@ export async function processCombinedPopularityMatrix(combinedPopularityMatrix: 
     await popularChart.save()
   }
 
-  console.timeEnd('done saving popularcharts to db')
+  logger.profile('done saving popularcharts to db')
 }

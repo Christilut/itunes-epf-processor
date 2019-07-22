@@ -1,6 +1,6 @@
 require('app-module-path').addPath(__dirname + '/..')
 
-import 'config/logger'
+import logger from 'config/logger'
 import * as mongoose from 'config/mongoose'
 import 'config/sentry'
 import { COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD, COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_SONGS, COLLECTION_SONGS_OLD, COLLECTION_SONGS_PROCESSING, PopularChartModel, PopularChartProcessingModel, SongModel, SongProcessingModel } from 'server/models'
@@ -12,7 +12,7 @@ import { processCombinedPopularityMatrix } from './processing/database'
 import { INumberStringSignature } from './interfaces/generic'
 
 mongoose.default.connection.once('open', async function () {
-  console.log('starting EPF update process')
+  logger.info('starting EPF update process')
 
   const lastStats: IFeedStats = getStats()
 
@@ -21,7 +21,7 @@ mongoose.default.connection.once('open', async function () {
 
   const epfInfo: IFeedInfoObject = await getLatestFeedInfo()
 
-  console.log(epfInfo)
+  logger.info(epfInfo)
 
   if (!lastStats) retrieveFullFeed = true // Server never ran yet, get full feed
   if (!lastStats && epfInfo.incremental) retrieveIncrementalFeed = true // Server never ran & incremental available, get incremental too
@@ -31,8 +31,8 @@ mongoose.default.connection.once('open', async function () {
     if (epfInfo.incremental && epfInfo.incremental.date > lastStats.lastImported) retrieveIncrementalFeed = true // Incremental available and its newer than last time we processed
   }
 
-  console.log('going to retrieve full feed:', retrieveFullFeed)
-  console.log('going to retrieve incremental feed:', retrieveIncrementalFeed)
+  logger.info('going to retrieve full feed:', retrieveFullFeed)
+  logger.info('going to retrieve incremental feed:', retrieveIncrementalFeed)
 
   let countryCodeByStorefrontIdMap: INumberStringSignature
   let genreIdMap: INumberStringSignature
@@ -56,14 +56,14 @@ mongoose.default.connection.once('open', async function () {
     await SongProcessingModel.collection.createIndex({ songId: 1 }, { unique: true })
     await PopularChartProcessingModel.collection.createIndex({ storefrontId: 1, genreId: 1 }, { unique: true })
 
-    console.log('done copying collections to temporary collections')
+    logger.info('done copying collections to temporary collections')
   } else {
-    console.log('no new feeds found')
+    logger.info('no new feeds found')
   }
 
   if (retrieveFullFeed) {
-    console.time('done retrieving full feed')
-    console.log('started retrieving full feed')
+    logger.profile('done retrieving full feed')
+    logger.info('started retrieving full feed')
 
     const { combinedPopularityMatrix, savedSongIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.full.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
@@ -73,12 +73,12 @@ mongoose.default.connection.once('open', async function () {
 
     writeStats()
 
-    console.timeEnd('done retrieving full feed')
+    logger.profile('done retrieving full feed')
   }
 
   if (retrieveIncrementalFeed) {
-    console.time('done processing incremental feed')
-    console.log('started processing incremental feed')
+    logger.profile('done processing incremental feed')
+    logger.info('started processing incremental feed')
 
     const { combinedPopularityMatrix, savedSongIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
@@ -88,7 +88,7 @@ mongoose.default.connection.once('open', async function () {
 
     writeStats()
 
-    console.timeEnd('done processing incremental feed')
+    logger.profile('done processing incremental feed')
   }
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
@@ -102,7 +102,7 @@ mongoose.default.connection.once('open', async function () {
     await mongoose.default.connection.db.dropCollection(COLLECTION_POPULARCHARTS_OLD)
   }
 
-  console.log('EPF update process complete')
+  logger.info('EPF update process complete')
 
   // process.exit(0)
 })
