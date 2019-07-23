@@ -40,13 +40,13 @@ export class Song extends Typegoose {
   viewUrl: string
 
   @prop()
+  itunesReleaseDate: Date
+
+  @prop()
   durationMs: number
 
   @prop()
   previewUrl: string
-
-  @prop()
-  previewDurationMs: number
 }
 
 const model = new Song().getModelForClass(Song, {

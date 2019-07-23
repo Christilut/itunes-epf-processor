@@ -5,6 +5,7 @@ import { ReadStream } from 'fs'
 import { InstanceType } from 'typegoose'
 import { INumberStringSignature, IStringStringSignature } from '../interfaces/generic'
 import { IPopularityMatrixSignature } from '../interfaces/epf'
+import * as Moment from 'moment'
 import logger from 'config/logger'
 const countryCodesByIso2 = require('../../countryCodes.json')
 
@@ -73,11 +74,11 @@ export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream,
       song.artistName = row[6].toString()
       song.collectionName = row[7].toString()
       song.viewUrl = row[8].toString()
+      song.itunesReleaseDate = Moment(row[10].toString(), 'YYYY MM DD').toDate()
       song.durationMs = parseInt(row[11].toString(), 10)
 
       if (row[14]) {
         song.previewUrl = row[14].toString()
-        song.previewDurationMs = parseInt(row[15].toString(), 10)
       }
 
       await song.save()
