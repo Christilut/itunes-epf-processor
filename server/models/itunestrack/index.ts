@@ -1,9 +1,9 @@
 import { prop, Typegoose } from 'typegoose'
 import { generateModel } from '../../helpers/typegoose'
 
-export const COLLECTION_ITUNES_TRACK = 'itunestrack'
-export const COLLECTION_ITUNES_TRACK_OLD = 'itunestrack_old'
-export const COLLECTION_ITUNES_TRACK_PROCESSING = 'itunestrack_processing'
+export const COLLECTION_ITUNES_TRACK = 'itunestracks'
+export const COLLECTION_ITUNES_TRACK_OLD = 'itunestracks_old'
+export const COLLECTION_ITUNES_TRACK_PROCESSING = 'itunestracks_processing'
 
 export class ItunesTrack extends Typegoose {
   _id: string
