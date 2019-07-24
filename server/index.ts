@@ -92,8 +92,13 @@ mongoose.default.connection.once('open', async function () {
 
     // Swap collection names and delete old collection
     await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK, COLLECTION_ITUNES_TRACK_OLD)
+    console.log('collections after track->old', (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name))
+
     await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK_PROCESSING, COLLECTION_ITUNES_TRACK)
+    console.log('collections after processing->track', (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name))
+
     await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_OLD)
+    console.log('collections after drop old', (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name))
 
     await mongoose.default.connection.db.renameCollection(COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD)
     await mongoose.default.connection.db.renameCollection(COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS)
