@@ -1,4 +1,4 @@
-import { SongProcessingModel, Song } from '../models/song'
+import { ItunesTrackProcessingModel, ItunesTrack } from '../models/itunestrack'
 import * as lineReader from 'line-reader'
 import { promisify } from 'util'
 import { ReadStream } from 'fs'
@@ -37,9 +37,9 @@ const ALLOWED_GENRE_MAP: { [key: number]: number } = { // The left side will be 
   1049: 1049 // Jungle/Drum & Bass
 }
 
-export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream, insertOnly: boolean): Promise<void> {
-  logger.profile('done adding songs to db')
-  logger.info('started adding songs to db')
+export async function upsertItunesTracks(savedItunesTrackIds: Set<number>, stream: ReadStream, insertOnly: boolean): Promise<void> {
+  logger.profile('done adding itunes tracks to db')
+  logger.info('started adding itunes tracks to db')
 
   let scannedAmount: number = 0
 
@@ -54,35 +54,35 @@ export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream,
       return callback(true) // Next line
     }
 
-    const songId: number = parseInt(row[1].toString(), 10)
+    const itunesTrackId: number = parseInt(row[1].toString(), 10)
 
-    if (savedSongIds.has(songId)) {
-      let song: InstanceType<Song>
+    if (savedItunesTrackIds.has(itunesTrackId)) {
+      let itunesTrack: InstanceType<ItunesTrack>
 
       if (insertOnly) { // With full feed we only want to add, no need to slow the process down with lookups
-        song = new SongProcessingModel()
+        itunesTrack = new ItunesTrackProcessingModel()
       } else {
-        song = await SongProcessingModel.findOne({ songId })
+        itunesTrack = await ItunesTrackProcessingModel.findOne({ itunesTrackId: itunesTrackId })
 
-        if (!song) {
-          song = new SongProcessingModel()
+        if (!itunesTrack) {
+          itunesTrack = new ItunesTrackProcessingModel()
         }
       }
 
-      song.songId = songId
-      song.title = row[2].toString()
-      song.artistName = row[6].toString()
-      song.collectionName = row[7].toString()
-      song.viewUrl = row[8].toString()
-      song.originalReleaseDate = Moment(row[9].toString(), 'YYYY MM DD').toDate()
-      song.itunesReleaseDate = Moment(row[10].toString(), 'YYYY MM DD').toDate()
-      song.durationMs = parseInt(row[11].toString(), 10)
+      itunesTrack.itunesTrackId = itunesTrackId
+      itunesTrack.title = row[2].toString()
+      itunesTrack.artistName = row[6].toString()
+      itunesTrack.collectionName = row[7].toString()
+      itunesTrack.viewUrl = row[8].toString()
+      itunesTrack.originalReleaseDate = Moment(row[9].toString(), 'YYYY MM DD').toDate()
+      itunesTrack.itunesReleaseDate = Moment(row[10].toString(), 'YYYY MM DD').toDate()
+      itunesTrack.durationMs = parseInt(row[11].toString(), 10)
 
       if (row[14]) {
-        song.previewUrl = row[14].toString()
+        itunesTrack.previewUrl = row[14].toString()
       }
 
-      await song.save()
+      await itunesTrack.save()
     }
 
     scannedAmount++
@@ -94,7 +94,7 @@ export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream,
     callback(!last) // End if last or next line
   })
 
-  logger.profile('done adding songs to db')
+  logger.profile('done adding itunes tracks to db')
 }
 
 export async function readEpfGenreByLine(stream: ReadStream): Promise<INumberStringSignature> {
@@ -123,12 +123,12 @@ export async function readEpfGenreByLine(stream: ReadStream): Promise<INumberStr
   return genreIdMap
 }
 
-export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{ combinedPopularityMatrix: IPopularityMatrixSignature, savedSongIds: Set<number> }> {
+export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{ combinedPopularityMatrix: IPopularityMatrixSignature, savedItunesTrackIds: Set<number> }> {
   logger.profile('done processing popularity')
   logger.info('started processing popularity')
 
   const combinedPopularityMatrix: IPopularityMatrixSignature = {}
-  const savedSongIds: Set<number> = new Set([])
+  const savedItunesTrackIds: Set<number> = new Set([])
 
   await eachLine(stream, async function (line: string, last: boolean, callback: Function) {
     if (line.indexOf('#') === 0) return callback(true) // Go to next line
@@ -139,7 +139,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
 
     const storefrontId: number = parseInt(row[1].toString(), 10)
     const genreId: number = parseInt(row[2].toString(), 10)
-    const songId: number = parseInt(row[3].toString(), 10)
+    const itunesTrackId: number = parseInt(row[3].toString(), 10)
 
     const allowedGenreId: number = ALLOWED_GENRE_MAP[genreId]
 
@@ -151,10 +151,10 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
       }
 
       if (combinedPopularityMatrix[id].length < TOP_AMOUNT) {
-        combinedPopularityMatrix[id].push(songId)
+        combinedPopularityMatrix[id].push(itunesTrackId)
       }
 
-      savedSongIds.add(songId)
+      savedItunesTrackIds.add(itunesTrackId)
     }
 
     callback(!last)
@@ -164,7 +164,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
 
   return {
     combinedPopularityMatrix,
-    savedSongIds
+    savedItunesTrackIds: savedItunesTrackIds
   }
 }
 

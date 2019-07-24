@@ -43,7 +43,7 @@ export class PopularChart extends Typegoose {
   @prop({
     default: []
   })
-  topSongIds: number[]
+  topItunesTrackIds: number[]
 }
 
 const model = new PopularChart().getModelForClass(PopularChart, {

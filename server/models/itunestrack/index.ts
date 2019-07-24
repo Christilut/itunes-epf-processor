@@ -1,11 +1,11 @@
 import { prop, Typegoose } from 'typegoose'
 import { generateModel } from '../../helpers/typegoose'
 
-export const COLLECTION_SONGS = 'songs'
-export const COLLECTION_SONGS_OLD = 'songs_old'
-export const COLLECTION_SONGS_PROCESSING = 'songs_processing'
+export const COLLECTION_ITUNES_TRACK = 'itunestrack'
+export const COLLECTION_ITUNES_TRACK_OLD = 'itunestrack_old'
+export const COLLECTION_ITUNES_TRACK_PROCESSING = 'itunestrack_processing'
 
-export class Song extends Typegoose {
+export class ItunesTrack extends Typegoose {
   _id: string
 
   @prop()
@@ -19,7 +19,7 @@ export class Song extends Typegoose {
     index: true,
     required: true
   })
-  songId: number
+  itunesTrackId: number
 
   @prop({
     required: true
@@ -52,11 +52,11 @@ export class Song extends Typegoose {
   previewUrl: string
 }
 
-const model = new Song().getModelForClass(Song, {
+const model = new ItunesTrack().getModelForClass(ItunesTrack, {
   schemaOptions: {
     timestamps: true
   }
 })
 
-export const SongModel = generateModel<Song>(model, COLLECTION_SONGS)
-export const SongProcessingModel = generateModel<Song>(model, COLLECTION_SONGS_PROCESSING)
+export const ItunesTrackModel = generateModel<ItunesTrack>(model, COLLECTION_ITUNES_TRACK)
+export const ItunesTrackProcessingModel = generateModel<ItunesTrack>(model, COLLECTION_ITUNES_TRACK_PROCESSING)

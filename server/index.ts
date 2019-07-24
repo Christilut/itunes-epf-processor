@@ -6,9 +6,9 @@ import { INumberStringSignature } from './interfaces/generic'
 import { processCombinedPopularityMatrix } from './processing/process'
 import { getUrlZipStream } from './processing/downloader'
 import { getLatestFeedInfo, IFeedInfoObject } from './processing/feedcheck'
-import { readEpfGenreByLine, readEpfSongPopularityByLine, readEpfStorefrontByLine, upsertSongs } from './processing/reader'
+import { readEpfGenreByLine, readEpfSongPopularityByLine, readEpfStorefrontByLine, upsertItunesTracks } from './processing/reader'
 import { getStats, IFeedStats, writeStats } from './processing/stats'
-import { COLLECTION_SONGS_PROCESSING, COLLECTION_SONGS_OLD, SongModel, COLLECTION_SONGS } from './models/song'
+import { COLLECTION_ITUNES_TRACK_PROCESSING, COLLECTION_ITUNES_TRACK_OLD, ItunesTrackModel, COLLECTION_ITUNES_TRACK } from './models/itunestrack'
 import { COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS_OLD, PopularChartModel, COLLECTION_POPULARCHARTS } from './models/popularchart'
 
 mongoose.default.connection.once('open', async function () {
@@ -44,16 +44,16 @@ mongoose.default.connection.once('open', async function () {
     // Make sure old unused collections are deleted
     const existingCollections = (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name)
 
-    if (existingCollections.includes(COLLECTION_SONGS_PROCESSING)) await mongoose.default.connection.db.dropCollection(COLLECTION_SONGS_PROCESSING)
+    if (existingCollections.includes(COLLECTION_ITUNES_TRACK_PROCESSING)) await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_PROCESSING)
     if (existingCollections.includes(COLLECTION_POPULARCHARTS_PROCESSING)) await mongoose.default.connection.db.dropCollection(COLLECTION_POPULARCHARTS_PROCESSING)
-    if (existingCollections.includes(COLLECTION_SONGS_OLD)) await mongoose.default.connection.db.dropCollection(COLLECTION_SONGS_OLD)
+    if (existingCollections.includes(COLLECTION_ITUNES_TRACK_OLD)) await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_OLD)
     if (existingCollections.includes(COLLECTION_POPULARCHARTS_OLD)) await mongoose.default.connection.db.dropCollection(COLLECTION_POPULARCHARTS_OLD)
 
     // Now copy live collection to temporary collection to be used during the EPF process
-    await SongModel.aggregate([{ $match: {} }, { $out: COLLECTION_SONGS_PROCESSING }])
+    await ItunesTrackModel.aggregate([{ $match: {} }, { $out: COLLECTION_ITUNES_TRACK_PROCESSING }])
     await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
 
-    await mongoose.default.connection.db.createIndex(COLLECTION_SONGS_PROCESSING, { songId: 1 }, { unique: true })
+    await mongoose.default.connection.db.createIndex(COLLECTION_ITUNES_TRACK_PROCESSING, { itunesTrackId: 1 }, { unique: true })
     await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
 
     logger.info('done copying collections to temporary collections')
@@ -65,11 +65,11 @@ mongoose.default.connection.once('open', async function () {
     logger.profile('done retrieving full feed')
     logger.info('started retrieving full feed')
 
-    const { combinedPopularityMatrix, savedSongIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.full.popularityFolderUrl}song_popularity_per_genre.tbz`))
+    const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.full.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
     await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
 
-    await upsertSongs(savedSongIds, await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}song.tbz`), true)
+    await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}song.tbz`), true)
 
     logger.profile('done retrieving full feed')
   }
@@ -78,11 +78,11 @@ mongoose.default.connection.once('open', async function () {
     logger.profile('done processing incremental feed')
     logger.info('started processing incremental feed')
 
-    const { combinedPopularityMatrix, savedSongIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
+    const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
     await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
 
-    await upsertSongs(savedSongIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
+    await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
 
     logger.profile('done processing incremental feed')
   }
@@ -91,9 +91,9 @@ mongoose.default.connection.once('open', async function () {
     writeStats()
 
     // Swap collection names and delete old collection
-    await mongoose.default.connection.db.renameCollection(COLLECTION_SONGS, COLLECTION_SONGS_OLD)
-    await mongoose.default.connection.db.renameCollection(COLLECTION_SONGS_PROCESSING, COLLECTION_SONGS)
-    await mongoose.default.connection.db.dropCollection(COLLECTION_SONGS_OLD)
+    await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK, COLLECTION_ITUNES_TRACK_OLD)
+    await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK_PROCESSING, COLLECTION_ITUNES_TRACK)
+    await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_OLD)
 
     await mongoose.default.connection.db.renameCollection(COLLECTION_POPULARCHARTS, COLLECTION_POPULARCHARTS_OLD)
     await mongoose.default.connection.db.renameCollection(COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS)

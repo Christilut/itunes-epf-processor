@@ -24,14 +24,14 @@ export async function processCombinedPopularityMatrix(combinedPopularityMatrix: 
 
       popularChart.storefrontId = storefrontId
       popularChart.genreId = genreId
-      popularChart.topSongIds = []
+      popularChart.topItunesTrackIds = []
       popularChart.countryCode = countryCodeByStorefrontIdMap[storefrontId]
       popularChart.genreName = genreIdMap[genreId]
     }
 
-    popularChart.topSongIds = combinedPopularityMatrix[pair]
+    popularChart.topItunesTrackIds = combinedPopularityMatrix[pair]
 
-    popularChart.markModified('topSongIds')
+    popularChart.markModified('topItunesTrackIds')
 
     await popularChart.save()
   }
