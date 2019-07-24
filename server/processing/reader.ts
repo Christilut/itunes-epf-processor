@@ -74,6 +74,7 @@ export async function upsertSongs(savedSongIds: Set<number>, stream: ReadStream,
       song.artistName = row[6].toString()
       song.collectionName = row[7].toString()
       song.viewUrl = row[8].toString()
+      song.originalReleaseDate = Moment(row[9].toString(), 'YYYY MM DD').toDate()
       song.itunesReleaseDate = Moment(row[10].toString(), 'YYYY MM DD').toDate()
       song.durationMs = parseInt(row[11].toString(), 10)
 

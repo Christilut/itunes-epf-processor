@@ -40,6 +40,9 @@ export class Song extends Typegoose {
   viewUrl: string
 
   @prop()
+  originalReleaseDate: Date
+
+  @prop()
   itunesReleaseDate: Date
 
   @prop()
