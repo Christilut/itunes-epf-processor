@@ -8,12 +8,6 @@ export const COLLECTION_ITUNES_TRACK_PROCESSING = 'itunestracks_processing'
 export class ItunesTrack extends Typegoose {
   _id: string
 
-  @prop()
-  createdAt: Date
-
-  @prop()
-  updatedAt: Date
-
   @prop({
     unique: true,
     index: true,
@@ -52,11 +46,7 @@ export class ItunesTrack extends Typegoose {
   previewUrl: string
 }
 
-const model = new ItunesTrack().getModelForClass(ItunesTrack, {
-  schemaOptions: {
-    timestamps: true
-  }
-})
+const model = new ItunesTrack().getModelForClass(ItunesTrack)
 
 export const ItunesTrackModel = generateModel<ItunesTrack>(model, COLLECTION_ITUNES_TRACK)
 export const ItunesTrackProcessingModel = generateModel<ItunesTrack>(model, COLLECTION_ITUNES_TRACK_PROCESSING)

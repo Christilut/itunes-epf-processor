@@ -10,12 +10,6 @@ export const COLLECTION_POPULARCHARTS_PROCESSING = 'popularcharts_processing'
 export class PopularChart extends Typegoose {
   _id: string
 
-  @prop()
-  createdAt: Date
-
-  @prop()
-  updatedAt: Date
-
   @prop({
     maxlength: 2,
     minlength: 2,
@@ -46,11 +40,7 @@ export class PopularChart extends Typegoose {
   topItunesTrackIds: number[]
 }
 
-const model = new PopularChart().getModelForClass(PopularChart, {
-  schemaOptions: {
-    timestamps: true
-  }
-})
+const model = new PopularChart().getModelForClass(PopularChart)
 
 export const PopularChartModel = generateModel<PopularChart>(model, COLLECTION_POPULARCHARTS)
 export const PopularChartProcessingModel = generateModel<PopularChart>(model, COLLECTION_POPULARCHARTS_PROCESSING)
