@@ -1,8 +1,15 @@
 import { writeJsonSync, existsSync, readFileSync } from 'fs-extra'
 import { join } from 'path'
 import logger from '../../config/logger'
+import env from 'config/env'
 
-const STATS_PATH: string = join(__dirname, '..', '..', 'stats.json')
+let STATS_PATH: string = join(__dirname, '..', '..')
+
+if (env.NODE_ENV === env.Environments.Production) {
+  STATS_PATH = join(STATS_PATH, '..') // Because of the dist/ folder
+}
+
+STATS_PATH = join(STATS_PATH, 'stats.json')
 
 export interface IFeedStats {
   lastImported: Date
@@ -21,7 +28,11 @@ export function writeStats(): void {
 }
 
 export function getStats(): IFeedStats {
-  if (!existsSync(STATS_PATH)) return null
+  if (!existsSync(STATS_PATH)) {
+    logger.info('no previous stats found')
+
+    return null
+  }
 
   const json = JSON.parse(readFileSync(STATS_PATH).toString())
 

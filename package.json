@@ -10,7 +10,7 @@
     "npm": "6"
   },
   "scripts": {
-    "start": "npm run build && node dist/server/index",
+    "start": "npm run build && cross-env NODE_ENV=production node dist/server/index",
     "build": "npm run clean && tsc && npm run build:copy-files && npm run build:copy-testfiles && npm run build:copy-scripts",
     "build:copy-testfiles": "copyfiles tests/files/* dist/",
     "build:copy-scripts": "copyfiles scripts/deployment/* dist/",
