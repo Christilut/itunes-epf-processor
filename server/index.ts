@@ -32,7 +32,7 @@ mongoose.default.connection.once('open', async function () {
   }
 
   logger.info('going to retrieve full feed: ' + retrieveFullFeed)
-  logger.info('going to retrieve incremental feed: ' + retrieveIncrementalFeed)
+  // logger.info('going to retrieve incremental feed: ' + retrieveIncrementalFeed)
 
   let countryCodeByStorefrontIdMap: INumberStringSignature
   let genreIdMap: INumberStringSignature
@@ -58,15 +58,16 @@ mongoose.default.connection.once('open', async function () {
     }
 
     // Now copy live collection to temporary collection to be used during the EPF process
-    if (!retrieveFullFeed) { // When retrieving a full feed, we want to start clean so dont copy anything
-      await ItunesTrackModel.aggregate([{ $match: {} }, { $out: COLLECTION_ITUNES_TRACK_PROCESSING }])
-      await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
+    // Note: only used for incremental
+    // if (!retrieveFullFeed) { // When retrieving a full feed, we want to start clean so dont copy anything
+    //   await ItunesTrackModel.aggregate([{ $match: {} }, { $out: COLLECTION_ITUNES_TRACK_PROCESSING }])
+    //   await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
 
-      await mongoose.default.connection.db.createIndex(COLLECTION_ITUNES_TRACK_PROCESSING, { itunesTrackId: 1 }, { unique: true })
-      await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
+    //   await mongoose.default.connection.db.createIndex(COLLECTION_ITUNES_TRACK_PROCESSING, { itunesTrackId: 1 }, { unique: true })
+    //   await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
 
-      logger.info('done copying collections to temporary collections')
-    }
+    //   logger.info('done copying collections to temporary collections')
+    // }
   } else {
     logger.info('no new feeds found')
   }
@@ -84,18 +85,19 @@ mongoose.default.connection.once('open', async function () {
     logger.profile('done retrieving full feed')
   }
 
-  if (retrieveIncrementalFeed) {
-    logger.profile('done processing incremental feed')
-    logger.info('started processing incremental feed')
+  // Note: It seems that the song_popularity_per_genre file on the EPF server contains very old and totally different data from the full feed version of the file. So incremental feed is disabled for now.
+  // if (retrieveIncrementalFeed) {
+  //   logger.profile('done processing incremental feed')
+  //   logger.info('started processing incremental feed')
 
-    const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
+  //   const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
-    await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
+  //   await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
 
-    await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
+  //   await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
 
-    logger.profile('done processing incremental feed')
-  }
+  //   logger.profile('done processing incremental feed')
+  // }
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
     writeStats()
