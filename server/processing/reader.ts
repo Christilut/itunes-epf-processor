@@ -13,29 +13,71 @@ const eachLine = promisify(lineReader.eachLine)
 
 const TOP_AMOUNT = 100
 
-const ALLOWED_GENRE_MAP: { [key: number]: number } = { // The left side will be mapped to the right side. Leave the same if the original genre is good.
-  2: 2, // Blues
-  6: 6, // Country
-  7: 7, // Electronic
-  11: 11, // Jazz
-  12: 12, // Latin
-  14: 14, // Pop
-  15: 15, // R&B/Soul
-  17: 17, // Dance
-  18: 18, // Hiphop/Rap
-  19: 19, // World
-  20: 20, // Alternative
-  21: 21, // Rock
-  24: 24, // Reggea
-  25: 25, // Easy Listening
-  1044: 1044, // Breakbeat  // These are dance subgenres (techno, dnb, etc) that will have their own genre object
-  1047: 1047, // Hardcore
-  1050: 1050, // Techno
-  1051: 1051, // Trance
-  1046: 1046, // Garage
-  1048: 1048, // House
-  1049: 1049 // Jungle/Drum & Bass
-}
+const ALLOWED_GENREIDS: number[] = [
+  // These genres are properly filled on itunes:
+  6, // Country
+  7, // Electronic
+  12, // Latin
+  14, // Pop
+  15, // R&B/Soul
+  17, // Dance
+  18, // Hiphop/Rap
+  20, // Alternative
+  21 // Rock
+
+  // These have very few songs and/or are very outdated
+  // 1048: 1048 // House
+  // 2: 2, // Blues
+  // 19: 19, // World
+  // 24: 24, // Reggea
+  // 11: 11, // Jazz
+  // 25: 25, // Easy Listening
+  // 1044: 1044, // Breakbeat  // These are dance subgenres (techno, dnb, etc) that will have their own genre object
+  // 1047: 1047, // Hardcore
+  // 1050: 1050, // Techno
+  // 1051: 1051, // Trance
+  // 1046: 1046, // Garage
+  // 1049: 1049 // Jungle/Drum & Bass
+]
+
+const ALLOWED_STOREFRONTIDS: number[] = [
+  143460, // Australia
+  143445, // Austria
+  143446, // Belgium
+  143503, // Brasil
+  143455, // Canada
+  143489, // Czech Republic
+  143458, // Denmark
+  143447, // Finland
+  143442, // France
+  143443, // Germany
+  143448, // Greece
+  143463, // Hong Kong
+  143467, // India
+  143476, // Indonesia
+  143449, // Ireland
+  143491, // Israel
+  143450, // Italy
+  143462, // Japan
+  143468, // Mexico
+  143452, // Netherlands
+  143461, // New Zealand
+  143457, // Norway
+  143474, // Philippines
+  143478, // Poland
+  143453, // Portugal
+  143469, // Russia
+  143472, // South Africa
+  143454, // Spain
+  143456, // Sweden
+  143459, // Switzerland
+  143475, // Thailand
+  143480, // Turkey
+  143471, // Vietnam
+  143444, // UK
+  143492, // Ukraine
+  143441 // US
+]
 
 export async function upsertItunesTracks(savedItunesTrackIds: Set<number>, stream: ReadStream, insertOnly: boolean): Promise<void> {
   logger.profile('done adding itunes tracks to db')
@@ -142,10 +184,11 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
     const itunesTrackId: number = parseInt(row[3].toString(), 10)
     // const rank: number = parseInt(row[4].toString(), 10)
 
-    const allowedGenreId: number = ALLOWED_GENRE_MAP[genreId]
+    const isGenreAllowed: boolean = ALLOWED_GENREIDS.includes(genreId)
+    const isStorefrontAllowed: boolean = ALLOWED_STOREFRONTIDS.includes(storefrontId)
 
-    if (allowedGenreId) {
-      const id: string = `${storefrontId}.${allowedGenreId}`
+    if (isGenreAllowed && isStorefrontAllowed) {
+      const id: string = `${storefrontId}.${genreId}`
 
       if (!combinedPopularityMatrix[id]) {
         combinedPopularityMatrix[id] = []

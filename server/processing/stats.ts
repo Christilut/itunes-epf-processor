@@ -1,5 +1,6 @@
 import { writeJsonSync, existsSync, readFileSync } from 'fs-extra'
 import { join } from 'path'
+import logger from '../../config/logger'
 
 const STATS_PATH: string = join(__dirname, '..', '..', 'stats.json')
 
@@ -13,6 +14,10 @@ export function writeStats(): void {
   }
 
   writeJsonSync(STATS_PATH, stats)
+
+  logger.info(`wrote stats to ${STATS_PATH}`, {
+    stats
+  })
 }
 
 export function getStats(): IFeedStats {
@@ -23,6 +28,10 @@ export function getStats(): IFeedStats {
   const stats: IFeedStats = {
     lastImported: new Date(json.lastImported)
   }
+
+  logger.info(`read stats from ${STATS_PATH}`, {
+    stats
+  })
 
   return stats
 }
