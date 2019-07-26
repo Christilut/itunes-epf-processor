@@ -42,21 +42,31 @@ mongoose.default.connection.once('open', async function () {
     genreIdMap = await readEpfGenreByLine(await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}genre.tbz`))
 
     // Make sure old unused collections are deleted
-    const existingCollections = (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name)
+    let existingCollections = (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name)
 
     if (existingCollections.includes(COLLECTION_ITUNES_TRACK_PROCESSING)) await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_PROCESSING)
     if (existingCollections.includes(COLLECTION_POPULARCHARTS_PROCESSING)) await mongoose.default.connection.db.dropCollection(COLLECTION_POPULARCHARTS_PROCESSING)
     if (existingCollections.includes(COLLECTION_ITUNES_TRACK_OLD)) await mongoose.default.connection.db.dropCollection(COLLECTION_ITUNES_TRACK_OLD)
     if (existingCollections.includes(COLLECTION_POPULARCHARTS_OLD)) await mongoose.default.connection.db.dropCollection(COLLECTION_POPULARCHARTS_OLD)
 
+    existingCollections = (await mongoose.default.connection.db.listCollections({}, { nameOnly: true }).toArray()).map(x => x.name)
+
+    if (existingCollections.includes(COLLECTION_ITUNES_TRACK_PROCESSING) || existingCollections.includes(COLLECTION_POPULARCHARTS_PROCESSING)) {
+      logger.error('existing collection includes collections that should have been deleted', existingCollections)
+
+      throw new Error('existing collection includes collections that should have been deleted')
+    }
+
     // Now copy live collection to temporary collection to be used during the EPF process
-    await ItunesTrackModel.aggregate([{ $match: {} }, { $out: COLLECTION_ITUNES_TRACK_PROCESSING }])
-    await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
+    if (!retrieveFullFeed) { // When retrieving a full feed, we want to start clean so dont copy anything
+      await ItunesTrackModel.aggregate([{ $match: {} }, { $out: COLLECTION_ITUNES_TRACK_PROCESSING }])
+      await PopularChartModel.aggregate([{ $match: {} }, { $out: COLLECTION_POPULARCHARTS_PROCESSING }])
 
-    await mongoose.default.connection.db.createIndex(COLLECTION_ITUNES_TRACK_PROCESSING, { itunesTrackId: 1 }, { unique: true })
-    await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
+      await mongoose.default.connection.db.createIndex(COLLECTION_ITUNES_TRACK_PROCESSING, { itunesTrackId: 1 }, { unique: true })
+      await mongoose.default.connection.db.createIndex(COLLECTION_POPULARCHARTS_PROCESSING, { storefrontId: 1, genreId: 1 }, { unique: true })
 
-    logger.info('done copying collections to temporary collections')
+      logger.info('done copying collections to temporary collections')
+    }
   } else {
     logger.info('no new feeds found')
   }

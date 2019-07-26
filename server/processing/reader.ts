@@ -140,6 +140,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
     const storefrontId: number = parseInt(row[1].toString(), 10)
     const genreId: number = parseInt(row[2].toString(), 10)
     const itunesTrackId: number = parseInt(row[3].toString(), 10)
+    // const rank: number = parseInt(row[4].toString(), 10)
 
     const allowedGenreId: number = ALLOWED_GENRE_MAP[genreId]
 
