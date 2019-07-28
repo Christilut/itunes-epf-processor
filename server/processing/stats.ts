@@ -15,9 +15,9 @@ export interface IFeedStats {
   lastImported: Date
 }
 
-export function writeStats(): void {
+export function writeStats(date: Date): void {
   const stats: IFeedStats = {
-    lastImported: new Date()
+    lastImported: date
   }
 
   writeJsonSync(STATS_PATH, stats)

@@ -13,10 +13,12 @@ import { COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS_OLD, Popu
 import env from '../config/env'
 
 mongoose.default.connection.once('open', async function () {
-  if (!process.argv.includes('--start')) {
+  if (!process.argv.includes('--start')) { // This is needed because I'm starting it from the Heroku Scheduler and I want to be sure it's not started accidentally
     logger.info('cancelled process because it was not started with the --start flag')
     return process.exit(0)
   }
+
+  const startTime: Date = new Date()
 
   logger.info(`starting EPF update process (${env.NODE_ENV})`)
 
@@ -104,7 +106,7 @@ mongoose.default.connection.once('open', async function () {
   }
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
-    writeStats()
+    writeStats(startTime)
 
     // Swap collection names and delete old collection
     await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK, COLLECTION_ITUNES_TRACK_OLD)
