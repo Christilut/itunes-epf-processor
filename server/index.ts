@@ -13,6 +13,11 @@ import { COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS_OLD, Popu
 import env from '../config/env'
 
 mongoose.default.connection.once('open', async function () {
+  if (!process.argv.includes('--flag')) {
+    logger.info('cancelled process because it was not started with the --start flag')
+    return process.exit(0)
+  }
+
   logger.info(`starting EPF update process (${env.NODE_ENV})`)
 
   const lastStats: IFeedStats = getStats()
