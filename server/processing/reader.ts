@@ -164,7 +164,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
 
   return {
     combinedPopularityMatrix,
-    savedItunesTrackIds: savedItunesTrackIds
+    savedItunesTrackIds
   }
 }
 
