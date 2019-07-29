@@ -68,7 +68,19 @@ if (env.NODE_ENV !== env.Environments.Test) {
   }))
 }
 
-export default winston.createLogger({
+const logger = winston.createLogger({
   transports,
   silent: env.NODE_ENV === env.Environments.Test
 })
+
+logger.exit = function () {
+  if (env.NODE_ENV !== env.Environments.Test && env.AWS_LOG_GROUP) {
+    const transport = transports.find((t) => t.name === 'using-kthxbye') // Weird thing to flush logs so last logs don't disappear when doing process.exit()
+
+    transport.kthxbye(function () {
+      console.log('bye')
+    })
+  }
+}
+
+export default logger

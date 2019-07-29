@@ -120,5 +120,7 @@ mongoose.default.connection.once('open', async function () {
 
   logger.info('EPF update process complete')
 
+  logger.exit()
+
   process.exit(0)
 })
