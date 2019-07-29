@@ -10,7 +10,7 @@
     "npm": "6"
   },
   "scripts": {
-    "start": "npm run build && cross-env NODE_ENV=production node dist/server/index --start",
+    "start": "npm run build && cross-env NODE_ENV=production node dist/server/index",
     "build": "npm run clean && tsc && npm run build:copy-files && npm run build:copy-testfiles && npm run build:copy-scripts",
     "build:copy-testfiles": "copyfiles tests/files/* dist/",
     "build:copy-scripts": "copyfiles scripts/deployment/* dist/",
@@ -91,7 +91,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "! grep -ir --exclude-dir=node_modules --exclude-dir=.git --exclude=package.json '// TEMP' ."
+      "pre-commit": "! grep -ir --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist/ --exclude=package.json '// TEMP' ."
     }
   }
 }

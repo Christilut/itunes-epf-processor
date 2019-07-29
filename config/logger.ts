@@ -75,7 +75,7 @@ const logger = winston.createLogger({
 
 logger.exit = function () {
   if (env.NODE_ENV !== env.Environments.Test && env.AWS_LOG_GROUP) {
-    const transport = transports.find((t) => t.name === 'using-kthxbye') // Weird thing to flush logs so last logs don't disappear when doing process.exit()
+    const transport = transports.find((t) => t.name === 'CloudWatch') // Weird thing to flush logs so last logs don't disappear when doing process.exit()
 
     transport.kthxbye(function () {
       console.log('terminated cloudwatch transport')
