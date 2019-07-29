@@ -78,7 +78,7 @@ logger.exit = function () {
     const transport = transports.find((t) => t.name === 'using-kthxbye') // Weird thing to flush logs so last logs don't disappear when doing process.exit()
 
     transport.kthxbye(function () {
-      console.log('bye')
+      console.log('terminated cloudwatch transport')
     })
   }
 }

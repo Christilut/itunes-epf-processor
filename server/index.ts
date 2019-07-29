@@ -22,7 +22,9 @@ mongoose.default.connection.once('open', async function () {
 
   logger.info(`starting EPF update process (${env.NODE_ENV})`)
 
-  const lastStats: IFeedStats = getStats()
+  const lastStats: IFeedStats = await getStats()
+
+  logger.info('stats from last run', lastStats)
 
   let retrieveFullFeed: boolean = false
   let retrieveIncrementalFeed: boolean = false
@@ -106,7 +108,7 @@ mongoose.default.connection.once('open', async function () {
   }
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
-    writeStats(startTime)
+    await writeStats(startTime)
 
     // Swap collection names and delete old collection
     await mongoose.default.connection.db.renameCollection(COLLECTION_ITUNES_TRACK, COLLECTION_ITUNES_TRACK_OLD)

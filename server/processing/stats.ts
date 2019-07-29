@@ -2,47 +2,71 @@ import { writeJsonSync, existsSync, readFileSync } from 'fs-extra'
 import { join } from 'path'
 import logger from '../../config/logger'
 import env from 'config/env'
+import { uploadFileToS3, downloadFile as downloadFileFromS3 } from '../helpers/s3'
 
-let STATS_PATH: string = join(__dirname, '..', '..')
-
-if (env.NODE_ENV === env.Environments.Production) {
-  STATS_PATH = join(STATS_PATH, '..') // Because of the dist/ folder
-}
-
-STATS_PATH = join(STATS_PATH, 'stats.json')
+const STATS_FILENAME: string = 'stats.json'
+const BUCKET: string = 'itunes-epf-processor'
+const STATS_PATH_DEVELOPMENT: string = join(__dirname, '..', '..', STATS_FILENAME)
 
 export interface IFeedStats {
   lastImported: Date
 }
 
-export function writeStats(date: Date): void {
+export async function writeStats(date: Date): Promise<void> {
   const stats: IFeedStats = {
     lastImported: date
   }
 
-  writeJsonSync(STATS_PATH, stats)
+  if (env.NODE_ENV === env.Environments.Production) {
+    await uploadFileToS3({
+      content: Buffer.from(JSON.stringify(stats)),
+      filename: null, // Not used
+      key: STATS_FILENAME
+    }, BUCKET)
 
-  logger.info(`wrote stats to ${STATS_PATH}`, {
-    stats
-  })
+    logger.info(`wrote stats to s3`, {
+      bucket: BUCKET,
+      key: STATS_FILENAME,
+      stats
+    })
+  } else {
+    writeJsonSync(STATS_PATH_DEVELOPMENT, stats)
+
+    logger.info(`wrote stats to ${STATS_PATH_DEVELOPMENT}`, {
+      stats
+    })
+  }
 }
 
-export function getStats(): IFeedStats {
-  if (!existsSync(STATS_PATH)) {
-    logger.info('no previous stats found')
+export async function getStats(): Promise<IFeedStats> {
+  let json: IFeedStats
 
-    return null
+  if (env.NODE_ENV === env.Environments.Production) {
+    const buffer = await downloadFileFromS3({
+      bucket: BUCKET,
+      key: STATS_FILENAME
+    })
+
+    if (!buffer) return null
+
+    json = JSON.parse(buffer.toString())
+  } else {
+    if (!existsSync(STATS_PATH_DEVELOPMENT)) {
+      logger.info('no previous stats found')
+
+      return null
+    }
+
+    json = JSON.parse(readFileSync(STATS_PATH_DEVELOPMENT).toString())
+
+    logger.info(`read stats from ${STATS_PATH_DEVELOPMENT}`, {
+      json
+    })
   }
-
-  const json = JSON.parse(readFileSync(STATS_PATH).toString())
 
   const stats: IFeedStats = {
     lastImported: new Date(json.lastImported)
   }
-
-  logger.info(`read stats from ${STATS_PATH}`, {
-    stats
-  })
 
   return stats
 }
