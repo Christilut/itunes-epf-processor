@@ -11,6 +11,7 @@ import { getStats, IFeedStats, writeStats } from './processing/stats'
 import { COLLECTION_ITUNES_TRACK_PROCESSING, COLLECTION_ITUNES_TRACK_OLD, ItunesTrackModel, COLLECTION_ITUNES_TRACK } from './models/itunestrack'
 import { COLLECTION_POPULARCHARTS_PROCESSING, COLLECTION_POPULARCHARTS_OLD, PopularChartModel, COLLECTION_POPULARCHARTS } from './models/popularchart'
 import env from '../config/env'
+import { timeout } from '../tests/helpers/time'
 
 mongoose.default.connection.once('open', async function () {
   if (!process.argv.includes('--start')) { // This is needed because I'm starting it from the Heroku Scheduler and I want to be sure it's not started accidentally
@@ -122,7 +123,7 @@ mongoose.default.connection.once('open', async function () {
 
   logger.info('EPF update process complete')
 
-  logger.exit()
+  await timeout(10000) // Wait a bit so logs can flush. Winston-cloudwatch way of flushing logs doesnt seem to work.
 
   process.exit(0)
 })
