@@ -34,7 +34,7 @@ if (env.SENTRY_URL) {
   console.log('Sentry:\t\t\tMissing Sentry credentials, not loading')
 }
 
-export function message(message: string, extra: object) {
+export function sentryMessage(message: string, extra?: object) {
   Sentry.withScope(scope => {
     for (const key in extra) {
       scope.setExtra(key, extra[key])
@@ -45,7 +45,7 @@ export function message(message: string, extra: object) {
   })
 }
 
-export function exception(err: Error, extra: object) {
+export function sentryException(err: Error, extra?: object) {
   Sentry.withScope(scope => {
     for (const key in extra) {
       scope.setExtra(key, extra[key])
