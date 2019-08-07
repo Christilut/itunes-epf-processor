@@ -44,6 +44,9 @@ export class ItunesTrack extends Typegoose {
 
   @prop()
   previewUrl: string
+
+  @prop()
+  rank: number
 }
 
 const model = new ItunesTrack().getModelForClass(ItunesTrack)

@@ -1,9 +1,9 @@
 import { PopularChartProcessingModel } from '../models/popularchart'
 import { INumberStringSignature } from '../interfaces/generic'
-import { IPopularityMatrixSignature } from '../interfaces/epf'
+import { IPopularityMatrixSignature, ISongRankSignature } from '../interfaces/epf'
 import logger from 'config/logger'
 
-export async function processCombinedPopularityMatrix(combinedPopularityMatrix: IPopularityMatrixSignature, genreIdMap: INumberStringSignature, countryCodeByStorefrontIdMap: INumberStringSignature) {
+export async function processCombinedPopularityMatrix(combinedPopularityMatrix: IPopularityMatrixSignature, genreIdMap: INumberStringSignature, countryCodeByStorefrontIdMap: INumberStringSignature, songRanks: ISongRankSignature) {
   logger.profile('done saving popularcharts to db')
   logger.info('started saving popularcharts to db')
 
@@ -30,6 +30,10 @@ export async function processCombinedPopularityMatrix(combinedPopularityMatrix: 
     }
 
     popularChart.topItunesTrackIds = combinedPopularityMatrix[pair]
+
+    popularChart.topItunesTrackIds.sort((a, b) => {
+      return songRanks[`${storefrontId}.${genreId}.${a}`] - songRanks[`${storefrontId}.${genreId}.${b}`]
+    })
 
     popularChart.markModified('topItunesTrackIds')
 

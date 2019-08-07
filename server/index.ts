@@ -86,9 +86,9 @@ mongoose.default.connection.once('open', async function () {
     logger.profile('done retrieving full feed')
     logger.info('started retrieving full feed')
 
-    const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.full.popularityFolderUrl}song_popularity_per_genre.tbz`))
+    const { combinedPopularityMatrix, savedItunesTrackIds, songRanks } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.full.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
-    await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
+    await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap, songRanks)
 
     await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}song.tbz`), true)
 
@@ -99,9 +99,9 @@ mongoose.default.connection.once('open', async function () {
     logger.profile('done processing incremental feed')
     logger.info('started processing incremental feed')
 
-    const { combinedPopularityMatrix, savedItunesTrackIds: savedItunesTrackIds } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
+    const { combinedPopularityMatrix, savedItunesTrackIds, songRanks } = await readEpfSongPopularityByLine(await getUrlZipStream(`${epfInfo.incremental.popularityFolderUrl}song_popularity_per_genre.tbz`))
 
-    await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap)
+    await processCombinedPopularityMatrix(combinedPopularityMatrix, genreIdMap, countryCodeByStorefrontIdMap, songRanks)
 
     await upsertItunesTracks(savedItunesTrackIds, await getUrlZipStream(`${epfInfo.incremental.itunesFolderUrl}song.tbz`), false)
 

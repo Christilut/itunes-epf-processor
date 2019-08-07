@@ -18,7 +18,7 @@
     "dev": "npm run dev:debug",
     "dev:container": "sudo docker-compose run start npm run dev:watch",
     "dev:watch": "cross-env DEBUG=true nodemon --exec 'ts-node' --ext ts server/index.ts --start",
-    "dev:debug": "nodemon --inspect server/index.ts --start",
+    "dev:debug": "nodemon server/index.ts --start",
     "deploy": "git push heroku master",
     "deploy:aws": "git pull && git checkout production && git merge master && npm run build && npm run test:all && git push && git checkout master && git push",
     "release": "standard-version --no-verify",

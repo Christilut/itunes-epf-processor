@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import { ReadStream } from 'fs'
 import { InstanceType } from 'typegoose'
 import { INumberStringSignature, IStringStringSignature } from '../interfaces/generic'
-import { IPopularityMatrixSignature } from '../interfaces/epf'
+import { IPopularityMatrixSignature, ISongRankSignature } from '../interfaces/epf'
 import * as Moment from 'moment'
 import logger from 'config/logger'
 const countryCodesByIso2 = require('../../countryCodes.json')
@@ -165,12 +165,13 @@ export async function readEpfGenreByLine(stream: ReadStream): Promise<INumberStr
   return genreIdMap
 }
 
-export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{ combinedPopularityMatrix: IPopularityMatrixSignature, savedItunesTrackIds: Set<number> }> {
+export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{ combinedPopularityMatrix: IPopularityMatrixSignature, savedItunesTrackIds: Set<number>, songRanks: ISongRankSignature }> {
   logger.profile('done processing popularity')
   logger.info('started processing popularity')
 
   const combinedPopularityMatrix: IPopularityMatrixSignature = {}
   const savedItunesTrackIds: Set<number> = new Set([])
+  const songRanks: ISongRankSignature = {}
 
   await eachLine(stream, async function (line: string, last: boolean, callback: Function) {
     if (line.indexOf('#') === 0) return callback(true) // Go to next line
@@ -182,7 +183,7 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
     const storefrontId: number = parseInt(row[1].toString(), 10)
     const genreId: number = parseInt(row[2].toString(), 10)
     const itunesTrackId: number = parseInt(row[3].toString(), 10)
-    // const rank: number = parseInt(row[4].toString(), 10)
+    const rank: number = parseInt(row[4].toString(), 10)
 
     const isGenreAllowed: boolean = ALLOWED_GENREIDS.includes(genreId)
     const isStorefrontAllowed: boolean = ALLOWED_STOREFRONTIDS.includes(storefrontId)
@@ -199,6 +200,8 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
       }
 
       savedItunesTrackIds.add(itunesTrackId)
+
+      songRanks[`${storefrontId}.${genreId}.${itunesTrackId}`] = rank
     }
 
     callback(!last)
@@ -208,7 +211,8 @@ export async function readEpfSongPopularityByLine(stream: ReadStream): Promise<{
 
   return {
     combinedPopularityMatrix,
-    savedItunesTrackIds
+    savedItunesTrackIds,
+    songRanks
   }
 }
 
