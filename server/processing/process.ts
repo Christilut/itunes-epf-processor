@@ -2,6 +2,7 @@ import { PopularChartProcessingModel } from '../models/popularchart'
 import { INumberStringSignature } from '../interfaces/generic'
 import { IPopularityMatrixSignature, ISongRankSignature } from '../interfaces/epf'
 import logger from 'config/logger'
+import { sentryMessage } from '../../config/sentry'
 
 export async function processCombinedPopularityMatrix(combinedPopularityMatrix: IPopularityMatrixSignature, genreIdMap: INumberStringSignature, countryCodeByStorefrontIdMap: INumberStringSignature, songRanks: ISongRankSignature) {
   logger.profile('done saving popularcharts to db')
@@ -37,7 +38,16 @@ export async function processCombinedPopularityMatrix(combinedPopularityMatrix: 
 
     popularChart.markModified('topItunesTrackIds')
 
-    await popularChart.save()
+    try {
+      await popularChart.save()
+    } catch (error) {
+      console.error(error)
+
+      sentryMessage('error during popular chart saving, skipping it', {
+        errorMessage: error.message,
+        error
+      })
+    }
   }
 
   logger.profile('done saving popularcharts to db')
