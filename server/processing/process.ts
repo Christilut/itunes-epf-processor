@@ -43,6 +43,8 @@ export async function processCombinedPopularityMatrix(combinedPopularityMatrix: 
     } catch (error) {
       console.error(error)
 
+      // Note: last time countryCode was undefined it was because the itunes storefront file had 0 records
+
       sentryMessage('error during popular chart saving, skipping it', {
         errorMessage: error.message,
         error
