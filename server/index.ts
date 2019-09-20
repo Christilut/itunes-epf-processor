@@ -49,9 +49,9 @@ mongoose.default.connection.once('open', async function () {
   let genreIdMap: INumberStringSignature
 
   if (retrieveFullFeed || retrieveIncrementalFeed) {
-    countryCodeByStorefrontIdMap = await readEpfStorefrontByLine(await getUrlZipStream(`https://${env.EPF_USERNAME}:${env.EPF_PASSWORD}@feeds.itunes.apple.com/feeds/epf/v4/full/20190724/itunes20190724/storefront.tbz`))  // Note: temporarily using this URL because for some reason the latest storefront file has 0 records on the itunes server
+    // countryCodeByStorefrontIdMap = await readEpfStorefrontByLine(await getUrlZipStream(`https://${env.EPF_USERNAME}:${env.EPF_PASSWORD}@feeds.itunes.apple.com/feeds/epf/v4/full/20190724/itunes20190724/storefront.tbz`))  // Note: temporarily using this URL because for some reason the latest storefront file has 0 records on the itunes server
 
-    // countryCodeByStorefrontIdMap = await readEpfStorefrontByLine(await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}storefront.tbz`))  // Using full here because these 2 almost never change
+    countryCodeByStorefrontIdMap = await readEpfStorefrontByLine(await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}storefront.tbz`))  // Using full here because these 2 almost never change
     genreIdMap = await readEpfGenreByLine(await getUrlZipStream(`${epfInfo.full.itunesFolderUrl}genre.tbz`))
 
     // Make sure old unused collections are deleted
