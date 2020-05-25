@@ -51,7 +51,7 @@
     "app-module-path": "2.2.0",
     "ava": "^1.4.1",
     "axios": "^0.19.0",
-    "bzip2-maybe": "^1.0.0",
+    "bzip2-maybe": "git+https://github.com/rekordcloud/bzip2-maybe.git",
     "cheerio": "^1.0.0-rc.3",
     "commitizen": "3.0.7",
     "copyfiles": "2.1.1",
