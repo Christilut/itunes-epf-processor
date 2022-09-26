@@ -80,7 +80,7 @@
     "typegoose": "5.8.1",
     "typescript": "3.5.3",
     "winston": "3.2.1",
-    "winston-cloudwatch": "2.0.5",
+    "winston-cloudwatch": "6.1.1",
     "winston-raven-sentry": "^2.0.0"
   },
   "license": "MIT",
